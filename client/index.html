@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html class="page" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гости</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="images/favicons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/favicons/apple.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="preload" href="fonts/Montserrat-Regular.woff2" type="font/woff2" as="font" crossorigin="anonymous">
+    <link rel="preload" href="fonts/Montserrat-Bold.woff2" type="font/woff2" as="font" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page__body">
+<main class="main">
+    <section class="guests">
+        <h1 class="guests__title">Гости</h1>
+        <table class="guests__table table table--hide">
+            <thead class="table__head">
+            <tr class="table__head-row">
+                <th class="table__head-cell">ID</th>
+                <th class="table__head-cell">Имя</th>
+                <th class="table__head-cell">Фамилия</th>
+                <th class="table__head-cell">Телефон</th>
+                <th class="table__head-cell">Email</th>
+                <th class="table__head-cell">Страна</th>
+                <th class="table__head-cell"></th>
+            </tr>
+            </thead>
+            <tbody class="table__body"></tbody>
+        </table>
+        <button class="guests__button button">Добавить</button>
+        <form class="guests__form form form--hide" novalidate>
+            <input type="hidden" id="id">
+            <div class="form__field">
+                <input class="form__input" id="first-name" name="first-name" placeholder="Имя" aria-label="Имя" required>
+                <span class="form__text-error" id="first-name-error"></span>
+            </div>
+            <div class="form__field">
+                <input class="form__input" id="last-name" name="last-name" placeholder="Фамилия" aria-label="Фамилия" required>
+                <span class="form__text-error" id="last-name-error"></span>
+            </div>
+            <div class="form__field">
+                <input class="form__input" type="tel" id="phone" name="phone" placeholder="Телефон" aria-label="Телефон" required>
+                <span class="form__text-error" id="phone-error"></span>
+            </div>
+            <div class="form__field">
+                <input class="form__input" type="email" id="email" name="email" placeholder="Email" aria-label="Email" required>
+                <span class="form__text-error" id="email-error"></span>
+            </div>
+            <div class="form__field">
+                <select class="form__select" id="country" aria-label="Выберите страну">
+                    <option value="" disabled selected hidden>Выберите страну</option>
+                    <option></option>
+                </select>
+            </div>
+            <div class="form__buttons">
+                <button class="form__button form__button--submit button">Сохранить</button>
+                <button class="form__button form__button--reset button" type="reset">Отменить</button>
+            </div>
+        </form>
+    </section>
+</main>
+<dialog class="modal" id="modal" aria-label="Информация">
+    <div class="modal__inner">
+        <div class="modal__text"></div>
+        <button class="modal__button button">ОК</button>
+    </div>
+</dialog>
+<script src="js/main.js" type="module"></script>
+</body>
+</html>
