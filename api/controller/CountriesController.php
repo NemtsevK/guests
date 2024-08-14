@@ -19,7 +19,7 @@ class CountriesController
 
         if ($statement === false) {
             http_response_code(500);
-            echo json_encode(['success' => false,'message' => 'Ошибка получения списка стран']);
+            echo json_encode(['success' => false, 'message' => 'Ошибка получения списка стран']);
             return;
         }
 

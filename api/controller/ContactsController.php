@@ -44,7 +44,7 @@ class ContactsController
         if (!$statement) {
             http_response_code(500);
             $message = $is_update ? 'Ошибка получения информации о госте' : 'Ошибка получения списка гостей';
-            echo json_encode(['success' => false,'message' => $message]);
+            echo json_encode(['success' => false, 'message' => $message]);
             return;
         }
 
@@ -83,7 +83,7 @@ class ContactsController
         $item->id = $data->id;
         $statement = $item->delete();
 
-        if($statement) {
+        if ($statement) {
             $success = true;
             $message = 'Информация о госте успешно удалена';
         } else {

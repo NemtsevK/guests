@@ -32,9 +32,8 @@ try {
     }
 } catch (Exception $error) {
     http_response_code(500);
-    echo json_encode(['success' => false,'message' => $error->getMessage()]);
+    echo json_encode(['success' => false, 'message' => $error->getMessage()]);
 }
-
 
 
 $end_time = microtime(true);
