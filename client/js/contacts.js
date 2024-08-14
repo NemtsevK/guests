@@ -10,16 +10,17 @@ const DEFAULT_URL = 'contacts.php';
  */
 async function setFormSuccess(form) {
   const result = await sendGuestData();
+  const { success, message } = result;
 
-  if (result.success === false) {
-    setModal(result.message);
+  if (success === false) {
+    setModal(message);
     return;
   }
 
   const table = document.querySelector('table');
   table.removeEventListener('click', handleTableClick);
 
-  setModal(result.message);
+  setModal(message);
   await getReadData();
   const buttonAdd = document.querySelector('.guests__button ');
   const hiddenInput = document.querySelector('#id ');
@@ -67,10 +68,10 @@ async function sendGuestData() {
  */
 async function getReadData() {
   const result = await sendReadGuests();
-  const { items } = result;
+  const { success, message, items } = result;
 
-  if (result === false) {
-    setModal('Ошибка получения данных');
+  if (success === false) {
+    setModal(message);
     return;
   }
 
@@ -116,13 +117,7 @@ async function getReadData() {
  */
 function handleTableClick({ target }) {
   if (target.classList.contains('table__button--edit')) {
-    const buttonAdd = document.querySelector('.guests__button');
-    const form = document.querySelector('.form');
-
-    buttonAdd.classList.add('guests__button--hide');
-    form.classList.remove('form--hide');
     getEditGuest(target.value);
-    initValidation();
   }
 
   if (target.classList.contains('table__button--delete')) {
@@ -164,19 +159,28 @@ async function sendReadGuests() {
  */
 async function getEditGuest(value) {
   const result = await sendEditGuest(value);
+  const { success, message, items } = result;
 
-  if (result === false) {
-    setModal('Ошибка получения данных');
+  if (success === false) {
+    setModal(message);
     return;
   }
 
-  const { id, first_name, last_name, phone, email, country } = result.items;
+  const { id, first_name, last_name, phone, email, country } = items;
   document.querySelector('#id').value = id;
   document.querySelector('#first-name').value = first_name;
   document.querySelector('#last-name').value = last_name;
   document.querySelector('#phone').value = phone;
   document.querySelector('#email').value = email;
   document.querySelector('#country').value = country;
+
+  const buttonAdd = document.querySelector('.guests__button');
+  const form = document.querySelector('.form');
+
+  buttonAdd.classList.add('guests__button--hide');
+  form.classList.remove('form--hide');
+
+  initValidation();
 }
 
 /**
@@ -186,7 +190,7 @@ async function getEditGuest(value) {
  */
 async function sendEditGuest(value) {
   try {
-    return await loadData({ url: `${DEFAULT_URL}?id=${encodeURIComponent(value)}`, method: 'GET'});
+    return await loadData({ url: `${DEFAULT_URL}?id=${encodeURIComponent(value)}`, method: 'GET' });
   } catch (error) {
     return false;
   }
@@ -199,13 +203,14 @@ async function sendEditGuest(value) {
  */
 async function getDeleteGuest(value) {
   const result = await sendDeleteGuest(value);
+  const { success, message } = result;
 
-  if (result === false) {
-    setModal('Ошибка удаления данных');
+  if (success === false) {
+    setModal(message);
     return;
   }
 
-  setModal(result.message);
+  setModal(message);
   await getReadData();
 }
 

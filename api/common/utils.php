@@ -1,7 +1,5 @@
 <?php
 
-use JetBrains\PhpStorm\NoReturn;
-
 /**
  * Очистка от запрещённых символов
  * @param string|null $text
@@ -23,15 +21,7 @@ function clean(?string $text, int $length = 100): ?string
     return $text ?: null;
 }
 
-/**
- * @param $value
- * @param $pattern
- * @return bool
- */
-function isValidate($value, $pattern): bool
-{
-    return preg_match($pattern['regex'], $value) !== false;
-}
+
 
 /**
  * проверка на уникальность поля в бд
@@ -62,22 +52,6 @@ function checkRepeat($value, $field, $id = null): bool
 }
 
 /**
- * Проверка обязательных полей
- * @param $fields
- * @return bool
- */
-function validateRequiredFields($fields): bool
-{
-    foreach ($fields as $field) {
-        if (empty($field)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/**
  * Валидация данных
  * @param $fields
  * @return array|true[]
@@ -88,7 +62,7 @@ function validateFields($fields): array
         $value = $items['value'] ?? null;
         $pattern = $items['pattern'];
 
-        if ($value !== null && !isValidate($value, $pattern)) {
+        if ($value !== null && !preg_match($pattern['regex'], $value)) {
             return ['success' => false, 'message' => $pattern['name']];
         }
     }
@@ -97,32 +71,18 @@ function validateFields($fields): array
 }
 
 /**
- * Отправка JSON-ответа с указанным статусом и сообщением и завершение выполнения скрипта
- * @param $success
- * @param $message
- * @return void
- */
-#[NoReturn] function sendJsonResponse($success, $message): void
-{
-    header('Content-Type: application/json');
-    echo json_encode(['success' => $success, 'message' => $message]);
-    exit;
-}
-
-/**
  * Получить страну по номеру телефона
- * @param $phone
+ * @param PDO $connection
+ * @param string $phone
  * @return mixed|null
  */
-function getCountryByPhone($phone): mixed
+function getCountryByPhone(PDO $connection, string $phone): mixed
 {
-    global $connect;
-
-    $prepare_string = prepareString($phone, 2, 4);
+    $prepare_string = array_reverse(prepareString($phone, 2, 4));
     $country = null;
 
     foreach ($prepare_string as $pattern) {
-        $query = $connect->query("
+        $query = $connection->query("
             SELECT name FROM countries
             WHERE phone_pattern LIKE '{$pattern}%'
             ORDER BY phone_pattern
@@ -130,7 +90,6 @@ function getCountryByPhone($phone): mixed
         ");
 
         $result = $query->fetch();
-
         if ($result) {
             $country = $result['name'];
             break;
@@ -141,7 +100,7 @@ function getCountryByPhone($phone): mixed
 }
 
 /**
- *
+ * Преобразование строки в массив строк, для поиска в базе данных
  * @param $input
  * @param $first
  * @param $last

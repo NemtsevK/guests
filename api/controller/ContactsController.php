@@ -28,6 +28,7 @@ class ContactsController
             $success = true;
             $message = 'Информация о госте успешно добавлена';
         } else {
+            http_response_code(500);
             $success = false;
             $message = 'Ошибка добавления гостя';
         }
@@ -38,15 +39,18 @@ class ContactsController
     public function read(): void
     {
         $items = new Contact($this->connection);
+        $is_update = isset($_GET['id']);
+        $items->id = $_GET['id'] ?? null;
+        $statement = $items->select();
 
-        if (isset($_GET['id'])) {
-            $items->id = $_GET['id'];
-            $statement = $items->select();
-            $items = $statement->fetch();
-        } else {
-            $statement = $items->select();
-            $items = $statement->fetchAll();
+        if (!$statement) {
+            http_response_code(500);
+            $message = $is_update ? 'Ошибка получения информации о госте' : 'Ошибка получения списка гостей';
+            echo json_encode(['success' => false,'message' => $message]);
+            return;
         }
+
+        $items = $is_update ? $statement->fetch() : $statement->fetchAll();
 
         echo json_encode(['success' => true, 'message' => 'Успешно', 'items' => $items]);
     }
@@ -69,12 +73,12 @@ class ContactsController
             $success = true;
             $message = 'Информация о госте успешно изменена';
         } else {
+            http_response_code(500);
             $success = false;
             $message = 'Ошибка изменения гостя';
         }
 
         echo json_encode(['success' => $success, 'message' => $message]);
-
     }
 
     public function delete(): void
@@ -88,6 +92,7 @@ class ContactsController
             $success = true;
             $message = 'Информация о госте успешно удалена';
         } else {
+            http_response_code(500);
             $success = false;
             $message = 'Ошибка удаления гостя';
         }

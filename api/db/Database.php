@@ -16,19 +16,19 @@ class Database
         $this->user = $config['user'];
         $this->password = $config['password'];
 
-        $this->connection_string = "pgsql:host={$DB_HOST};dbname={$DB_NAME}";
+        $this->connection_string = "pgsql:host=$DB_HOST;dbname=$DB_NAME";
     }
 
-    public function connect()
+    public function connect(): false|PDO|null
     {
-
         try {
             $this->connection = new PDO($this->connection_string, $this->user, $this->password, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ]);
         } catch (PDOException $error) {
-            die("Ошибка подключения к базе данных: " . $error->getMessage());
+            error_log('Ошибка подключения к базе данных: ' . $error->getMessage());
+            return false;
         }
 
         return $this->connection;

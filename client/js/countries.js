@@ -1,10 +1,16 @@
-import { loadData } from './utils.js';
+import { loadData, setModal } from './utils.js';
 
 const DEFAULT_URL = 'countries.php';
 
 async function initCountries() {
   const result = await sendCountries();
-  const { items } = result;
+  const { success, message, items } = result;
+
+  if (success === false) {
+    setModal(message);
+    return;
+  }
+
   const form__select = document.querySelector('.form__select');
 
   items.forEach(({ name }) => {

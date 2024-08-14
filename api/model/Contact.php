@@ -25,20 +25,25 @@ class Contact
         $this->phone = clean($this->phone, 20);
         $this->email = clean($this->email);
         $this->country = clean($this->country);
+        $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) :  $this->country;
 
         $query = "INSERT INTO $this->table (first_name, last_name, phone, email, country)
             VALUES (?, ?, ?, ?, ?)";
 
-        $statement = $this->connection->prepare($query);
-        $statement->execute([
-            $this->first_name,
-            $this->last_name,
-            $this->phone,
-            $this->email,
-            $this->country,
-        ]);
-
-        return $statement;
+        try {
+            $statement = $this->connection->prepare($query);
+            $statement->execute([
+                $this->first_name,
+                $this->last_name,
+                $this->phone,
+                $this->email,
+                $this->country,
+            ]);
+            return $statement;
+        } catch (PDOException $error) {
+            error_log('Ошибка добавления гостя: ' . $error->getMessage());
+            return false;
+        }
     }
 
     public function select(): false|PDOStatement
@@ -51,10 +56,14 @@ class Contact
             $params = [$this->id];
         }
 
-        $statement = $this->connection->prepare($query);
-        $statement->execute($params);
-
-        return $statement;
+        try {
+            $statement = $this->connection->prepare($query);
+            $statement->execute($params);
+            return $statement;
+        } catch (PDOException $error) {
+            error_log('Ошибка получения информации: ' . $error->getMessage());
+            return false;
+        }
     }
 
     public function update(): false|PDOStatement
@@ -65,6 +74,8 @@ class Contact
         $this->phone = clean($this->phone, 20);
         $this->email = clean($this->email);
         $this->country = clean($this->country);
+//        $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) :  $this->country;
+        $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) :  $this->country;
 
         $query = "UPDATE $this->table
             SET first_name = ?,
@@ -74,27 +85,35 @@ class Contact
             country = ?
             WHERE id = ?";
 
-        $statement = $this->connection->prepare($query);
-        $statement->execute([
-            $this->first_name,
-            $this->last_name,
-            $this->phone,
-            $this->email,
-            $this->country,
-            $this->id,
-        ]);
-
-        return $statement;
+        try {
+            $statement = $this->connection->prepare($query);
+            $statement->execute([
+                $this->first_name,
+                $this->last_name,
+                $this->phone,
+                $this->email,
+                $this->country,
+                $this->id,
+            ]);
+            return $statement;
+        } catch (PDOException $error) {
+            error_log('Ошибка изменения гостя: ' . $error->getMessage());
+            return false;
+        }
     }
 
     public function delete(): false|PDOStatement
     {
         $this->id = clean($this->id);
-
         $query = "DELETE FROM " . $this->table . " WHERE id = ?";
-        $statement = $this->connection->prepare($query);
-        $statement->execute([$this->id]);
 
-        return $statement;
+        try {
+            $statement = $this->connection->prepare($query);
+            $statement->execute([$this->id]);
+            return $statement;
+        } catch (PDOException $error) {
+            error_log('Ошибка удаления гостя: ' . $error->getMessage());
+            return false;
+        }
     }
 }

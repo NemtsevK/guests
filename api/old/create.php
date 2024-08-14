@@ -14,8 +14,10 @@ $phone = clean($_POST['phone'], 20);
 $email = clean($_POST['email']);
 $country = clean($_POST['country']);
 
-if (!validateRequiredFields([$first_name, $last_name, $phone])) {
-    sendJsonResponse(false, 'Имя, фамилия и телефон обязателен для заполнения');
+if (is_null($first_name) || is_null($last_name) || is_null($phone)) {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Имя, фамилия и телефон обязательны для заполнения']);
+    exit;
 }
 
 $validationResult = validateFields([
@@ -48,11 +50,15 @@ if (!$validationResult['success']) {
 }
 
 if (checkRepeat($phone, 'phone')) {
-    sendJsonResponse(false, 'Номер телефона должен быть уникальным');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Номер телефона должен быть уникальным']);
+    exit;
 }
 
 if (checkRepeat($email, 'email')) {
-    sendJsonResponse(false, 'Электронная почта должна быть уникальной');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Электронная почта должна быть уникальной']);
+    exit;
 }
 
 $country = is_null($country) ? getCountryByPhone($phone) :  $country;

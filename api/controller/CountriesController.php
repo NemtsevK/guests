@@ -15,17 +15,16 @@ class CountriesController
     {
         $items = new Country($this->connection);
 
-        $statement = $items->list();
-        $count = $statement->rowCount();
+        $statement = $items->select();
 
-        if ($count > 0) {
-            $message = 'Успешно';
-            $items =  $statement->fetchAll();
-        } else {
-            $message = 'Нет записей';
-            $items = null;
+        if ($statement === false) {
+            http_response_code(500);
+            echo json_encode(['success' => false,'message' => 'Ошибка получения списка стран']);
+            return;
         }
 
-        echo json_encode(['message' => $message, 'items' => $items]);
+        $items = $statement->fetchAll();
+
+        echo json_encode(['success' => true, 'message' => 'Успешно получен список стран', 'items' => $items]);
     }
 }
