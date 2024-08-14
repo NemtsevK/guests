@@ -65,18 +65,15 @@ class ContactsController
         $item->email = $data->email;
         $item->country = $data->country;
 
-        $statement = $item->update();
+        $result = $item->update();
 
-        if ($statement) {
-            $success = true;
-            $message = 'Информация о госте успешно изменена';
+        if ($result['success']) {
+            http_response_code(200);
         } else {
-            http_response_code(500);
-            $success = false;
-            $message = 'Ошибка изменения гостя';
+            http_response_code(400);
         }
 
-        echo json_encode(['success' => $success, 'message' => $message]);
+        echo json_encode(['success' => $result['success'], 'message' => $result['message']]);
     }
 
     public function delete(): void

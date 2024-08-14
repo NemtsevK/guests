@@ -1,5 +1,6 @@
 <?php
 require_once 'common/utils.php';
+require_once 'common/const.php';
 
 class Contact
 {
@@ -7,11 +8,11 @@ class Contact
     private string $table = 'contacts';
 
     public int|null $id = null;
-    public string $first_name;
-    public string $last_name;
-    public string $phone;
-    public string|null $email = null;
-    public string|null $country = null;
+    public string|null $first_name;
+    public string|null $last_name;
+    public string|null $phone;
+    public string|null $email;
+    public string|null $country;
 
     public function __construct($connection)
     {
@@ -20,12 +21,45 @@ class Contact
 
     public function insert(): array
     {
+        global $TEXT, $PHONE, $EMAIL;
+
         $this->first_name = clean($this->first_name);
         $this->last_name = clean($this->last_name);
         $this->phone = clean($this->phone, 20);
         $this->email = clean($this->email);
         $this->country = clean($this->country);
-        $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) :  $this->country;
+        $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) : $this->country;
+
+        if (is_null($this->first_name) || is_null($this->last_name) || is_null($this->phone)) {
+            return ['success' => false, 'message' => 'Имя, фамилия и телефон обязательны для заполнения'];
+        }
+
+        $validationResult = validateFields([
+            'first_name' => [
+                'value' => $this->first_name,
+                'pattern' => $TEXT,
+            ],
+            'last_name' => [
+                'value' => $this->last_name,
+                'pattern' => $TEXT,
+            ],
+            'phone' => [
+                'value' => $this->phone,
+                'pattern' => $PHONE,
+            ],
+            'email' => [
+                'value' => $this->email,
+                'pattern' => $EMAIL,
+            ],
+            'country' => [
+                'value' => $this->country,
+                'pattern' => $TEXT,
+            ],
+        ]);
+
+        if (!$validationResult['success']) {
+            return $validationResult;
+        }
 
         if (checkRepeat($this->connection, $this->phone, 'phone')) {
             return ['success' => false, 'message' => 'Номер телефона должен быть уникальным'];
@@ -47,7 +81,7 @@ class Contact
                 $this->email,
                 $this->country,
             ]);
-            return ['success' => true, 'message' => 'Информация о госте успешно добавлена'];;
+            return ['success' => true, 'message' => 'Информация о госте успешно добавлена'];
         } catch (PDOException $error) {
             error_log('Ошибка добавления гостя: ' . $error->getMessage());
             return ['success' => false, 'message' => 'Ошибка добавления гостя'];
@@ -74,15 +108,48 @@ class Contact
         }
     }
 
-    public function update(): false|PDOStatement
+    public function update(): array
     {
+        global $TEXT, $PHONE, $EMAIL;
+
         $this->id = clean($this->id);
         $this->first_name = clean($this->first_name);
         $this->last_name = clean($this->last_name);
         $this->phone = clean($this->phone, 20);
         $this->email = clean($this->email);
         $this->country = clean($this->country);
-        $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) :  $this->country;
+        $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) : $this->country;
+
+        if (is_null($this->first_name) || is_null($this->last_name) || is_null($this->phone)) {
+            return ['success' => false, 'message' => 'Имя, фамилия и телефон обязательны для заполнения'];
+        }
+
+        $validationResult = validateFields([
+            'first_name' => [
+                'value' => $this->first_name,
+                'pattern' => $TEXT,
+            ],
+            'last_name' => [
+                'value' => $this->last_name,
+                'pattern' => $TEXT,
+            ],
+            'phone' => [
+                'value' => $this->phone,
+                'pattern' => $PHONE,
+            ],
+            'email' => [
+                'value' => $this->email,
+                'pattern' => $EMAIL,
+            ],
+            'country' => [
+                'value' => $this->country,
+                'pattern' => $TEXT,
+            ],
+        ]);
+
+        if (!$validationResult['success']) {
+            return $validationResult;
+        }
 
         if (checkRepeat($this->connection, $this->phone, 'phone', $this->id)) {
             return ['success' => false, 'message' => 'Номер телефона должен быть уникальным'];
@@ -110,7 +177,7 @@ class Contact
                 $this->country,
                 $this->id,
             ]);
-            return $statement;
+            return ['success' => true, 'message' => 'Информация о госте успешно изменена'];
         } catch (PDOException $error) {
             error_log('Ошибка изменения гостя: ' . $error->getMessage());
             return false;
