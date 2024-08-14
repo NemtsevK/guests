@@ -18,7 +18,7 @@ class Contact
         $this->connection = $connection;
     }
 
-    public function insert(): false|PDOStatement
+    public function insert(): array
     {
         $this->first_name = clean($this->first_name);
         $this->last_name = clean($this->last_name);
@@ -26,6 +26,14 @@ class Contact
         $this->email = clean($this->email);
         $this->country = clean($this->country);
         $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) :  $this->country;
+
+        if (checkRepeat($this->connection, $this->phone, 'phone')) {
+            return ['success' => false, 'message' => 'Номер телефона должен быть уникальным'];
+        }
+
+        if (checkRepeat($this->connection, $this->email, 'email')) {
+            return ['success' => false, 'message' => 'Электронная почта должна быть уникальной'];
+        }
 
         $query = "INSERT INTO $this->table (first_name, last_name, phone, email, country)
             VALUES (?, ?, ?, ?, ?)";
@@ -39,10 +47,10 @@ class Contact
                 $this->email,
                 $this->country,
             ]);
-            return $statement;
+            return ['success' => true, 'message' => 'Информация о госте успешно добавлена'];;
         } catch (PDOException $error) {
             error_log('Ошибка добавления гостя: ' . $error->getMessage());
-            return false;
+            return ['success' => false, 'message' => 'Ошибка добавления гостя'];
         }
     }
 
@@ -74,8 +82,15 @@ class Contact
         $this->phone = clean($this->phone, 20);
         $this->email = clean($this->email);
         $this->country = clean($this->country);
-//        $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) :  $this->country;
         $this->country = is_null($this->country) ? getCountryByPhone($this->connection, $this->phone) :  $this->country;
+
+        if (checkRepeat($this->connection, $this->phone, 'phone', $this->id)) {
+            return ['success' => false, 'message' => 'Номер телефона должен быть уникальным'];
+        }
+
+        if (checkRepeat($this->connection, $this->email, 'email', $this->id)) {
+            return ['success' => false, 'message' => 'Электронная почта должна быть уникальной'];
+        }
 
         $query = "UPDATE $this->table
             SET first_name = ?,

@@ -30,16 +30,14 @@ function clean(?string $text, int $length = 100): ?string
  * @param null $id
  * @return bool
  */
-function checkRepeat($value, $field, $id = null): bool
+function checkRepeat($connection, $value, $field, $id = null): bool
 {
-    global $connect;
-
     if ($value !== null) {
         if (isset($id)) {
-            $query = $connect->prepare("SELECT * FROM contacts WHERE $field = ? AND id != ?");
+            $query = $connection->prepare("SELECT * FROM contacts WHERE $field = ? AND id != ?");
             $query->execute([$value, $id]);
         } else {
-            $query = $connect->prepare("SELECT * FROM contacts WHERE $field = ?");
+            $query = $connection->prepare("SELECT * FROM contacts WHERE $field = ?");
             $query->execute([$value]);
         }
 

@@ -22,18 +22,16 @@ class ContactsController
         $item->email = $data->email;
         $item->country = $data->country;
 
-        $statement = $item->insert();
+        $result = $item->insert();
 
-        if ($statement) {
-            $success = true;
-            $message = 'Информация о госте успешно добавлена';
+        if ($result['success']) {
+            http_response_code(201);
         } else {
-            http_response_code(500);
-            $success = false;
-            $message = 'Ошибка добавления гостя';
+            http_response_code(400);
         }
 
-        echo json_encode(['success' => $success, 'message' => $message]);
+        echo json_encode(['success' => $result['success'], 'message' => $result['message']]);
+
     }
 
     public function read(): void
