@@ -1,0 +1,97 @@
+<?php
+require_once 'db/Database.php';
+require_once 'model/Contact.php';
+
+class ContactsController
+{
+    private ?PDO $connection;
+
+    function __construct($connection)
+    {
+        $this->connection = $connection;
+    }
+
+    public function create(): void
+    {
+        $item = new Contact($this->connection);
+        $data = json_decode(file_get_contents("php://input"));
+
+        $item->first_name = $data->first_name;
+        $item->last_name = $data->last_name;
+        $item->phone = $data->phone;
+        $item->email = $data->email;
+        $item->country = $data->country;
+
+        $statement = $item->insert();
+
+        if ($statement) {
+            $success = true;
+            $message = 'Информация о госте успешно добавлена';
+        } else {
+            $success = false;
+            $message = 'Ошибка добавления гостя';
+        }
+
+        echo json_encode(['success' => $success, 'message' => $message]);
+    }
+
+    public function read(): void
+    {
+        $items = new Contact($this->connection);
+
+        if (isset($_GET['id'])) {
+            $items->id = $_GET['id'];
+            $statement = $items->select();
+            $items = $statement->fetch();
+        } else {
+            $statement = $items->select();
+            $items = $statement->fetchAll();
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Успешно', 'items' => $items]);
+    }
+
+    public function update(): void
+    {
+        $item = new Contact($this->connection);
+        $data = json_decode(file_get_contents("php://input"));
+
+        $item->id = $data->id;
+        $item->first_name = $data->first_name;
+        $item->last_name = $data->last_name;
+        $item->phone = $data->phone;
+        $item->email = $data->email;
+        $item->country = $data->country;
+
+        $statement = $item->update();
+
+        if ($statement) {
+            $success = true;
+            $message = 'Информация о госте успешно изменена';
+        } else {
+            $success = false;
+            $message = 'Ошибка изменения гостя';
+        }
+
+        echo json_encode(['success' => $success, 'message' => $message]);
+
+    }
+
+    public function delete(): void
+    {
+        $item = new Contact($this->connection);
+        $data = json_decode(file_get_contents("php://input"));
+        $item->id = $data->id;
+        $statement = $item->delete();
+
+        if($statement) {
+            $success = true;
+            $message = 'Информация о госте успешно удалена';
+        } else {
+            $success = false;
+            $message = 'Ошибка удаления гостя';
+        }
+
+        echo json_encode(['success' => $success, 'message' => $message]);
+    }
+}

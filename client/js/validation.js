@@ -1,4 +1,4 @@
-import { setFormSuccess } from './send-data.js';
+import { setFormSuccess } from './contacts.js';
 import { SPACES, inputsOptions } from './const.js';
 
 /**

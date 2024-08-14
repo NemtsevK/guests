@@ -1,6 +1,8 @@
 import { loadData, setModal } from './utils.js';
 import { initValidation, handleFormSubmit, handleFormClick, handleFormInput } from './validation.js';
 
+const DEFAULT_URL = 'contacts.php';
+
 /**
  * Получить ответ от сервера после создания или обновления гостя
  * @param form
@@ -40,18 +42,20 @@ async function sendGuestData() {
   const email = document.querySelector('#email').value;
   const country = document.querySelector('#country').value;
 
-  const formData = new URLSearchParams();
-  formData.append('id', id);
-  formData.append('first_name', firstName);
-  formData.append('last_name', lastName);
-  formData.append('phone', phone);
-  formData.append('email', email);
-  formData.append('country', country);
+  const formData = {
+    id: id,
+    first_name: firstName,
+    last_name: lastName,
+    phone: phone,
+    email: email,
+    country: country,
+  };
 
-  const url = id ? 'php/update.php' : 'php/create.php';
+  const body = JSON.stringify(formData);
+  const method = id ? 'PUT' : 'POST';
 
   try {
-    return await loadData({ url, method: 'POST', body: formData });
+    return await loadData({ url: DEFAULT_URL, method, body });
   } catch (error) {
     return false;
   }
@@ -63,6 +67,7 @@ async function sendGuestData() {
  */
 async function getReadData() {
   const result = await sendReadGuests();
+  const { items } = result;
 
   if (result === false) {
     setModal('Ошибка получения данных');
@@ -73,14 +78,14 @@ async function getReadData() {
   const tableBody = table.querySelector('.table__body');
   tableBody.innerHTML = '';
 
-  if (result.length > 0) {
+  if (items.length > 0) {
     table.classList.remove('table--hide');
   } else {
     table.classList.add('table--hide');
   }
 
-  result.forEach(contact => {
-    const { id, first_name, last_name, phone, email, country } = contact
+  items.forEach((item) => {
+    const { id, first_name, last_name, phone, email, country } = item
     const row = document.createElement('tr');
 
     row.classList.add('table__body-row')
@@ -146,7 +151,7 @@ function handleTableClick({ target }) {
  */
 async function sendReadGuests() {
   try {
-    return await loadData({ url: 'php/read.php' });
+    return await loadData({ url: DEFAULT_URL, method: 'GET' });
   } catch (error) {
     return false;
   }
@@ -165,7 +170,7 @@ async function getEditGuest(value) {
     return;
   }
 
-  const { id, first_name, last_name, phone, email, country } = result;
+  const { id, first_name, last_name, phone, email, country } = result.items;
   document.querySelector('#id').value = id;
   document.querySelector('#first-name').value = first_name;
   document.querySelector('#last-name').value = last_name;
@@ -180,11 +185,8 @@ async function getEditGuest(value) {
  * @return {Promise<boolean|*>}
  */
 async function sendEditGuest(value) {
-  const formData = new URLSearchParams();
-  formData.append('id', value);
-
   try {
-    return await loadData({ url: 'php/read.php', method: 'POST', body: formData });
+    return await loadData({ url: `${DEFAULT_URL}?id=${encodeURIComponent(value)}`, method: 'GET'});
   } catch (error) {
     return false;
   }
@@ -213,11 +215,11 @@ async function getDeleteGuest(value) {
  * @return {Promise<boolean|*>}
  */
 async function sendDeleteGuest(value) {
-  const formData = new URLSearchParams();
-  formData.append('id', value);
+  const formData = { id: value };
+  const body = JSON.stringify(formData);
 
   try {
-    return await loadData({ url: 'php/delete.php', method: 'POST', body: formData });
+    return await loadData({ url: DEFAULT_URL, method: 'DELETE', body });
   } catch (error) {
     return false;
   }

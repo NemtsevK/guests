@@ -1,8 +1,10 @@
+import { BASE_URL } from './const.js';
+
 /**
  * загрузка данных на сервер и их получение
  * @param {string}url
  * @param {string}method
- * @param {URLSearchParams|null} body
+ * @param {URLSearchParams|Object|null} body
  * @param {Object} headers
  * @returns {Promise<any>}
  */
@@ -13,7 +15,7 @@ async function loadData({
   headers = { 'Content-Type': 'application/x-www-form-urlencoded' },
 }) {
   try {
-    const response = await fetch(url, { method, body, headers });
+    const response = await fetch(`${BASE_URL}${url}` , { method, body, headers });
     return await response.json();
   } catch (error) {
     throw Error(error);

@@ -1,5 +1,5 @@
 import { initValidation } from './validation.js';
-import { getReadData } from './send-data.js';
+import { getReadData } from './contacts.js';
 import { initCountries } from './countries.js';
 
 const buttonAdd = document.querySelector('.guests__button ');

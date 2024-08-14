@@ -1,11 +1,13 @@
 import { loadData } from './utils.js';
 
+const DEFAULT_URL = 'countries.php';
 
 async function initCountries() {
   const result = await sendCountries();
+  const { items } = result;
   const form__select = document.querySelector('.form__select');
 
-  result.forEach(({ name }) => {
+  items.forEach(({ name }) => {
     const optionElement = document.createElement('option');
     optionElement.innerText = name;
     form__select.appendChild(optionElement);
@@ -18,7 +20,7 @@ async function initCountries() {
  */
 async function sendCountries() {
   try {
-    return await loadData({ url: 'php/countries.php' });
+    return await loadData({ url: DEFAULT_URL });
   } catch (error) {
     return false;
   }

@@ -1,4 +1,6 @@
-export const SPACES = /^[\s\n\t]+$/;
+const BASE_URL = '//localhost:8080/';
+
+const SPACES = /^[\s\n\t]+$/;
 
 const TEXT = {
   string: /^[A-zА-яЁё\s-]+$/,
@@ -15,7 +17,7 @@ const EMAIL = {
   name: 'Неправильный формат электронной почты',
 }
 
-export const inputsOptions = [
+const inputsOptions = [
   {
     id: 'first-name',
     pattern: TEXT,
@@ -41,3 +43,5 @@ export const inputsOptions = [
     required: false,
   },
 ];
+
+export { BASE_URL, SPACES, inputsOptions }

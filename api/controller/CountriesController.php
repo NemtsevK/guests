@@ -1,31 +1,31 @@
 <?php
-include_once '../db/Database.php';
-include_once '../model/Event.php';
+require_once 'db/Database.php';
+require_once 'model/Country.php';
 
-class EventsController
+class CountriesController
 {
-    private $connection;
+    private ?PDO $connection;
 
     function __construct($connection)
     {
         $this->connection = $connection;
     }
 
-
     public function read(): void
     {
-        $items = new Event($this->connection);
+        $items = new Country($this->connection);
 
         $statement = $items->list();
         $count = $statement->rowCount();
 
         if ($count > 0) {
-            $message = '';
+            $message = 'Успешно';
             $items =  $statement->fetchAll();
         } else {
             $message = 'Нет записей';
             $items = null;
         }
+
         echo json_encode(['message' => $message, 'items' => $items]);
     }
 }

@@ -15,7 +15,10 @@ function clean(?string $text, int $length = 100): ?string
     }
 
     $text = htmlspecialchars(strip_tags(stripslashes(trim($text))));
-    $text = iconv_substr($text, 0, $length, 'UTF-8');
+
+    if (iconv_strlen($text, 'UTF-8') > $length) {
+        $text = iconv_substr($text, 0, $length, 'UTF-8');
+    }
 
     return $text ?: null;
 }
